@@ -128,6 +128,7 @@ const AdminDashboard = ({ navigation }) => {
     try {
       const data = await authFetch(`/quizzes/${quizId}/toggle`, {
         method: 'PATCH',
+        body: JSON.stringify({}),
       });
 
       if (data.success) {

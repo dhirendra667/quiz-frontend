@@ -81,19 +81,35 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // Helper so any screen can make authenticated API calls
-  const authFetch = async (endpoint, options = {}) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        ...options.headers,
-      },
-    });
+    const authFetch = async (endpoint, options = {}) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          ...options.headers,
+        },
+      });
 
-    const data = await response.json();
-    return data;
+      // Read raw response first
+      const text = await response.text();
+
+      // console.log('RAW RESPONSE:', text);
+
+      // Prevent empty response crash
+      if (!text) {
+        throw new Error('Server returned empty response');
+      }
+
+      // Convert text to JSON safely
+      const data = JSON.parse(text);
+
+      return data;
+    } catch (error) {
+      console.log('AUTH FETCH ERROR:', error);
+      throw error;
+    }
   };
 
   return (
